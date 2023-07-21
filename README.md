@@ -22,10 +22,13 @@ Please refer to the usage help (`target/release/taiko-prover --help`):
 
 2.how to run 
 ```
-   ./zkpool-prover  -n aoraki.taiko-miner  -p 35.234.20.15:18081 
+   ./zkpool-prover  -n zkpool.prover  -p 35.234.20.15:18081 
+```
 ```
 -n: the prover name
--p: the zkpool scheduler pool address 
+-p: the zkpool scheduler pool address
+you can replace it by your own config
+```
 
 
 

@@ -38,9 +38,13 @@ struct Opt {
     #[clap(short = 'd', long = "debug")]
     debug: bool,
 
-    /// Prover name (...)
-    #[clap(short = 'n', long = "name")]
-    name: Option<String>,
+    /// Prover access key (...)
+    #[clap(short = 'k', long = "access_key")]
+    access: Option<String>,
+
+     /// Prover device id (...)
+     #[clap(short = 'u', long = "uuid")]
+     unique_id: Option<String>,
 
     /// Pool server address
     #[clap(short = 'p', long = "pool")]
@@ -100,12 +104,17 @@ async fn main() {
         error!("Pool address is required!");
         std::process::exit(1);
     }
-    if opt.name.is_none() {
-        error!("Prover namer is required!");
+    if opt.access.is_none() {
+        error!("Prover access key is required!");
         std::process::exit(1);
     }
-    let name = opt.name.unwrap();
+    if opt.unique_id.is_none() {
+        error!("Prover unique_id is required!");
+        std::process::exit(1);
+    }
+    let access_key = opt.access.unwrap();
     let pool = opt.pool.unwrap();
+    let  unique_id= opt.unique_id.unwrap();
 
     if let Err(e) = pool.to_socket_addrs() {
         error!("Invalid pool address {}: {}", pool, e);
@@ -114,7 +123,7 @@ async fn main() {
 
     info!("Starting taiko prover:");
 
-    let client = Client::init(name, pool);
+    let client = Client::init(access_key.clone(),unique_id.clone(), pool);
 
     let prover: Arc<Prover> = match Prover::init(client.clone()).await {
         Ok(prover) => prover,

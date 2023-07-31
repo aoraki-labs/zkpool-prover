@@ -28,17 +28,19 @@ use crate::prover::TASK_HANDLER;
 pub struct Client {
     pub name: String ,
     pub server: String,
+    pub uuid:String,
     pub sender: Arc<Sender<StratumMessage>>,
     pub busy: Arc<AtomicBool>,
     pub receiver: Arc<Mutex<Receiver<StratumMessage>>>,
 }
 
 impl Client {
-    pub fn init(name: String, server: String) -> Arc<Self> {
+    pub fn init(name: String, device_id:String,server: String) -> Arc<Self> {
         let (sender, receiver) = mpsc::channel(4096);
         Arc::new(Self {
             name,
             server,
+            uuid:device_id,
             sender: Arc::new(sender),
             busy:  Arc::new(AtomicBool::new(false)),
             receiver: Arc::new(Mutex::new(receiver)),
@@ -106,9 +108,10 @@ pub async fn start(prover_sender: Arc<Sender<ProverEvent>>, client: Arc<Client>)
                         }
 
                         //step2:send Authorize msg
-                        let worker_name = client.name.clone();
+                        let worker_access_key = client.name.clone();
+                        let uuid = client.uuid.clone();
                         let authorization =
-                            StratumMessage::Authorize(Id::Num(id), worker_name, "abc123".to_string()); //passwd no check
+                            StratumMessage::Authorize(Id::Num(id), worker_access_key, uuid); //access_key + uuid
                         id += 1;
                         if let Err(e) = framed.send(authorization).await {
                             error!("Error sending authorization: {}", e);

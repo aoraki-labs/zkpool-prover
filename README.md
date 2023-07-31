@@ -20,12 +20,13 @@ Please refer to the usage help (`target/release/taiko-prover --help`):
     wget https://storage.googleapis.com/zkevm-circuits-keys/kzg_bn254_21.srs -P ./
 ```
 
-2.how to run 
+2.how to run (example)
 ```
-   ./zkpool-prover  -n zkpool.prover  -p 35.234.20.15:18081 
+   ./zkpool-prover -k PYFkD1n6Q6btC3VcPJ29POm0DOWT7SXT -u 123456789 -p 35.201.232.215:18081
 ```
 ```
--n: the prover name
+-k: the prover access key
+-u: the prover device id
 -p: the zkpool scheduler pool address
 you can replace it by your own config
 ```

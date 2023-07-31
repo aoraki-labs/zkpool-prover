@@ -8,10 +8,12 @@ use std::{net::ToSocketAddrs, sync::Arc};
 
 use clap::Parser;
 
-use tracing::{error, info};
+use tracing::{error, info,debug};
 use tracing_subscriber::layer::SubscriberExt;
 
 use crate::prover::ProjectInfo;
+
+use machine_uid;
 
 use crate::{
     client::{start, Client},
@@ -108,13 +110,18 @@ async fn main() {
         error!("Prover access key is required!");
         std::process::exit(1);
     }
-    if opt.unique_id.is_none() {
-        error!("Prover unique_id is required!");
-        std::process::exit(1);
-    }
+
     let access_key = opt.access.unwrap();
     let pool = opt.pool.unwrap();
-    let  unique_id= opt.unique_id.unwrap();
+
+    let mut unique_id= String::from("");
+    if opt.unique_id.is_none() {
+        debug!("Prover unique_id is required, generate one automatically");
+        unique_id = machine_uid::get().unwrap();
+        println!("{}", unique_id);
+    }else {
+        unique_id=opt.unique_id.unwrap();
+    }
 
     if let Err(e) = pool.to_socket_addrs() {
         error!("Invalid pool address {}: {}", pool, e);
@@ -123,7 +130,7 @@ async fn main() {
 
     info!("Starting taiko prover:");
 
-    let client = Client::init(access_key.clone(),unique_id.clone(), pool);
+    let client = Client::init(access_key.clone(),unique_id, pool);
 
     let prover: Arc<Prover> = match Prover::init(client.clone()).await {
         Ok(prover) => prover,

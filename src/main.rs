@@ -118,7 +118,6 @@ async fn main() {
     if opt.unique_id.is_none() {
         debug!("Prover unique_id is required, generate one automatically");
         unique_id = machine_uid::get().unwrap();
-        println!("{}", unique_id);
     }else {
         unique_id=opt.unique_id.unwrap();
     }

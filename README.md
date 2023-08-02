@@ -26,7 +26,7 @@ Please refer to the usage help (`target/release/taiko-prover --help`):
 ```
 ```
 -k: the prover access key
--u: the prover device id
+-u: the prover device id (optional,program will generate one automatically if not set )
 -p: the zkpool scheduler pool address
 you can replace it by your own config
 ```

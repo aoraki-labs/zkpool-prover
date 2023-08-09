@@ -39,21 +39,21 @@ path = "./stratum"
 
 #taiko A4 testnet core lib
 [dependencies.prover]
-git = "https://github.com/zkrollupdev/taiko-prover-core"
+git = "https://github.com/aoraki-labs/taiko-prover-core"
 branch = "taiko-a4-final"
 package = "prover"
 [dependencies.zkevm_common]
-git = "https://github.com/zkrollupdev/taiko-prover-core"
+git = "https://github.com/aoraki-labs/taiko-prover-core"
 branch = "taiko-a4-final"
 package = "zkevm_common"
 
 #taiko A3 testnet core lib
 [dependencies.a3_prover]
-git = "https://github.com/zkrollupdev/taiko-prover-core"
+git = "https://github.com/aoraki-labs/taiko-prover-core"
 branch = "taiko-a3"
 package = "a3_prover"
 [dependencies.a3_zkevm_common ]
-git = "https://github.com/zkrollupdev/taiko-prover-core"
+git = "https://github.com/aoraki-labs/taiko-prover-core"
 branch = "taiko-a3"
 package = "a3_zkevm_common"
 

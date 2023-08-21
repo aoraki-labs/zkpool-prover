@@ -40,6 +40,10 @@ struct Opt {
     #[clap(short = 'd', long = "debug")]
     debug: bool,
 
+    /// Enable get version
+    #[clap(short = 'v', long = "version")]
+    version: bool,
+
     /// Prover access key (...)
     #[clap(short = 'k', long = "access_key")]
     access: Option<String>,
@@ -59,8 +63,6 @@ struct Opt {
     /// Output log to file
     #[clap(short = 'o', long = "log")]
     log: Option<String>,
-
-    jobs: Option<u8>,
 }
 
 #[tokio::main]
@@ -101,6 +103,12 @@ async fn main() {
     } else {
         tracing::subscriber::set_global_default(subscriber).expect("unable to set global default subscriber");
     }   
+
+    
+    if opt.version {
+        println!("0.1.0");
+        std::process::exit(1);
+    }
     
     if opt.pool.is_none() {
         error!("Pool address is required!");

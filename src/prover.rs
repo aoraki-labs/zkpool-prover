@@ -196,32 +196,34 @@ impl Prover {
                     let time_gap =(Instant::now().duration_since(time_started).as_millis() as u32)/1000;
                     info!("try to sumbit the block {} proof to zkpool,proof is {:?},time consumed:{}",block,agg_proof_result,time_gap);
 
-                    let mut proofoutput =String::from("");
-                    for var in &agg_proof_result.instance{
-                        proofoutput=format!("{}#{}",proofoutput,var.to_string())
-                    }
-                    let proof_res = format!("{}#{}",proofoutput,agg_proof_result.proof);
-                
-        
-                    let message = StratumMessage::Submit(
-                        Id::Num(0),
-                        project_name.clone(),
-                        block.to_string(),
-                        proof_res,
-                        agg_proof_result.k,
-                        time_gap,
-                    );
-                    if let Err(error) = client.sender().send(message).await { 
-                        error!("Failed to send PoolResponse: {}", error);
-                    }else{
-                        info!("zkpool:send the proof of block:{} success,time consumed:{}",block,time_gap);
-                    }
-                    info!("zkpool:end computed the task of block:{}",block);
-
-                    let current_task = LATEST_TASK_CONTENT.clone();
-                    let mut current_task_content = current_task.lock().await;
-                    *current_task_content = String::from("");
+                    if need_send_proof(project_name.clone(), block).await {
+                        let mut proofoutput =String::from("");
+                        for var in &agg_proof_result.instance{
+                            proofoutput=format!("{}#{}",proofoutput,var.to_string())
+                        }
+                        let proof_res = format!("{}#{}",proofoutput,agg_proof_result.proof);
                     
+            
+                        let message = StratumMessage::Submit(
+                            Id::Num(0),
+                            project_name.clone(),
+                            block.to_string(),
+                            proof_res,
+                            agg_proof_result.k,
+                            time_gap,
+                        );
+                        if let Err(error) = client.sender().send(message).await { 
+                            error!("Failed to send PoolResponse: {}", error);
+                        }else{
+                            info!("zkpool:send the proof of block:{} success,time consumed:{}",block,time_gap);
+                        }
+                        info!("zkpool:end computed the task of block:{}",block);
+
+                        let current_task = LATEST_TASK_CONTENT.clone();
+                        let mut current_task_content = current_task.lock().await;
+                        *current_task_content = String::from("");
+
+                    }  
                 });
     
                 // cache the task handle
@@ -280,25 +282,27 @@ impl Prover {
                     let time_gap =(Instant::now().duration_since(time_started).as_millis() as u32)/1000;
                     info!("try to sumbit the block {} proof to zkpool,proof is {:?},time consumed:{}",block,proof_result,time_gap);
 
-                    let message = StratumMessage::Submit(
-                        Id::Num(0),
-                        project_name,
-                        block.to_string(),
-                        format!("{}",proof_result.proof), //delete 0x prefix?
-                        proof_result.k,
-                        time_gap,
-                    );
-                    if let Err(error) = client.sender().send(message).await { 
-                        error!("Failed to send PoolResponse: {}", error);
-                    }else{
-                        info!("zkpool:send the proof of block:{} success,time consumed:{}",block,time_gap);
+                    if need_send_proof(project_name.clone(), block).await {
+                        let message = StratumMessage::Submit(
+                            Id::Num(0),
+                            project_name,
+                            block.to_string(),
+                            format!("{}",proof_result.proof), //delete 0x prefix?
+                            proof_result.k,
+                            time_gap,
+                        );
+                        if let Err(error) = client.sender().send(message).await { 
+                            error!("Failed to send PoolResponse: {}", error);
+                        }else{
+                            info!("zkpool:send the proof of block:{} success,time consumed:{}",block,time_gap);
+                        }
+                        info!("zkpool:end computed the task of block:{}",block);
+    
+                        let current_task = LATEST_TASK_CONTENT.clone();
+                        let mut current_task_content = current_task.lock().await;
+                        *current_task_content = String::from("");
+
                     }
-                    info!("zkpool:end computed the task of block:{}",block);
-
-                    let current_task = LATEST_TASK_CONTENT.clone();
-                    let mut current_task_content = current_task.lock().await;
-                    *current_task_content = String::from("");
-
                 });
     
                 // cache the task handle
@@ -308,5 +312,32 @@ impl Prover {
             });
         }
         info!("******one block task in process********");
+    }
+}
+
+
+pub async fn need_send_proof(project:String,block:u64) -> bool {
+    let current_task = LATEST_TASK_CONTENT.clone();
+    let current_task_content = current_task.lock().await;
+    if *current_task_content==String::from(""){ //initial
+        return true
+    }else {
+        let task_vec: Vec<&str> = (*current_task_content).split("#").collect();
+        if task_vec.len() != 2{
+            return true
+        }else {
+            let project_now=task_vec[0];
+            let cached_block = task_vec[1].parse::<u64>().unwrap();
+            info!("cached task info is:{}+{}",project_now,cached_block);
+            if project==project_now{
+                if block>=cached_block{
+                    return true
+                }else {
+                    return false
+                }
+            }else {
+                return false
+            }
+        }
     }
 }

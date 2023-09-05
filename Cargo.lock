@@ -5,7 +5,7 @@ version = 3
 [[package]]
 name = "a3_prover"
 version = "0.1.0"
-source = "git+https://github.com/zkrollupdev/taiko-prover-core?branch=taiko-a3#49ba780c1034014d6178a22dc84de9fa7048299f"
+source = "git+https://github.com/aoraki-labs/taiko-prover-core?branch=taiko-a3#f46281c73ba33b79c2ee499a5b77eaa3d2e5cc62"
 dependencies = [
  "a3_zkevm_common",
  "bus-mapping 0.1.0 (git+https://github.com/taikoxyz/zkevm-circuits.git?branch=feat/a3_pi)",
@@ -34,7 +34,7 @@ dependencies = [
 [[package]]
 name = "a3_zkevm_common"
 version = "0.1.0"
-source = "git+https://github.com/zkrollupdev/taiko-prover-core?branch=taiko-a3#49ba780c1034014d6178a22dc84de9fa7048299f"
+source = "git+https://github.com/aoraki-labs/taiko-prover-core?branch=taiko-a3#f46281c73ba33b79c2ee499a5b77eaa3d2e5cc62"
 dependencies = [
  "eth-types 0.1.0 (git+https://github.com/taikoxyz/zkevm-circuits.git?branch=feat/a3_pi)",
  "hyper",
@@ -2954,7 +2954,7 @@ dependencies = [
 [[package]]
 name = "prover"
 version = "0.1.0"
-source = "git+https://github.com/zkrollupdev/taiko-prover-core?branch=taiko-a4-final#173ed3f52d0182b41c5b8985d910f839a9300c84"
+source = "git+https://github.com/aoraki-labs/taiko-prover-core?branch=taiko-a4-final#8e755d0cc89e89da9e2303fecff745c543339275"
 dependencies = [
  "bus-mapping 0.1.0 (git+https://github.com/taikoxyz/zkevm-circuits.git?branch=feat/a4-aggregation)",
  "clap 4.3.16",
@@ -4765,7 +4765,7 @@ dependencies = [
 [[package]]
 name = "zkevm_common"
 version = "0.1.0"
-source = "git+https://github.com/zkrollupdev/taiko-prover-core?branch=taiko-a4-final#173ed3f52d0182b41c5b8985d910f839a9300c84"
+source = "git+https://github.com/aoraki-labs/taiko-prover-core?branch=taiko-a4-final#8e755d0cc89e89da9e2303fecff745c543339275"
 dependencies = [
  "eth-types 0.1.0 (git+https://github.com/taikoxyz/zkevm-circuits.git?branch=feat/a4-aggregation)",
  "hex",

@@ -46,7 +46,7 @@ jobs:
           command: build
           args: --release --target ${{ matrix.target }}
 
-      - name: Archive
+      - name: Archive Tar
         uses: a7ul/tar-action@v1.1.0
         with:
           command: c
@@ -55,7 +55,7 @@ jobs:
             zkpool-prover
           outPath: ${{ matrix.target }}.tar.gz
 
-      - name: Upload Release Asset
+      - name: Upload Release Asset - Tar
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -64,3 +64,19 @@ jobs:
           asset_path: ${{ matrix.target }}.tar.gz
           asset_name: ${{ matrix.target }}.tar.gz
           asset_content_type: application/tar+gzip
+
+      - name: Archive Zip
+        uses: vimtor/action-zip@v1
+        with:
+          files: target/${{ matrix.target }}/release/zkpool-prover
+          dest: ${{ matrix.target }}.zip
+
+      - name: Upload Release Asset - Zip
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ matrix.target }}.zip
+          asset_name: ${{ matrix.target }}.zip
+          asset_content_type: application/zip

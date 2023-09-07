@@ -25,6 +25,7 @@ impl Default for StratumCodec {
     }
 }
 
+// CHANGE(zkpool): use custom StratumMessage type
 #[derive(Serialize, Deserialize)]
 struct NotifyParams(String,u64,String,u64);
 
@@ -94,6 +95,7 @@ impl<'de> Deserialize<'de> for ResponseParams {
     }
 }
 
+// CHANGE(zkpool): use custom StratumMessage protocol and name 
 impl Encoder<StratumMessage> for StratumCodec {
     type Error = io::Error;
 
@@ -176,6 +178,7 @@ fn unwrap_u64_value(value: &Value) -> Result<u64, io::Error> {
     }
 }
 
+// CHANGE(zkpool): use custom StratumMessage protocol and name 
 impl Decoder for StratumCodec {
     type Error = io::Error;
     type Item = StratumMessage;

@@ -2,6 +2,7 @@ use json_rpc_types::{Error, Id};
 
 use crate::codec::ResponseParams;
 
+// CHANGE(zkpool): use custom StratumMessage protocol
 pub enum StratumMessage {
   
     Subscribe(Id, String, String, u64, u64, u64),
@@ -17,6 +18,7 @@ pub enum StratumMessage {
     Response(Id, Option<ResponseParams>, Option<Error<()>>),
 }
 
+// CHANGE(zkpool): use custom StratumMessage name
 impl StratumMessage {
     pub fn name(&self) -> &'static str {
         match self {

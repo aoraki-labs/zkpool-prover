@@ -6,4 +6,8 @@ This module comes from https://github.com/HarukaMa/aleo-pool-server/tree/testnet
 And there is some modification by Aoraki-Labs team.
 
 ## Tracing changes
-All source code changes by Aoraki-Labs team are commented with "CHANGE(Aoraki-Labs): ....", and the filenames of all additional files have the prefix "aoraki-labs_". 
+All source code changes by Aoraki-Labs team are commented with "CHANGE(zkpool): ...."
+
+## License
+
+AGPL-3.0-or-later

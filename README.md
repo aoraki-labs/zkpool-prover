@@ -5,9 +5,8 @@ It is used to connect with ZKPool in order to obtain proving tasks and generate 
 
 ### Supported ZKP projects
 
-1. Taiko A3
-2. Taiko A4
-3. More is coming
+1. Taiko A4
+2. More is coming
 
 ### Hardware Requirements
 

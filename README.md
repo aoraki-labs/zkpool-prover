@@ -1,45 +1,80 @@
 ## Introduction
 
-A standalone uniform zkpool prover build upon zkp circuit
+This is a universal modular prover that is built upon various zero-knowledge proof (ZKP) provers. 
+It is used to connect with ZKPool in order to obtain proving tasks and generate proofs.
 
+### Supported ZKP projects
 
-### CPU version
+1. Taiko A3
+2. Taiko A4
+3. More is coming
+
+### Hardware Requirements
+
+#### CPU version
+
+1. x86 Ubuntu 20.04/22.04
+- 8 or 16 core CPU
+- 32 GB memory
+2. Intel/M1 Apple macOS
+
+#### GPU version
+
+Coming soon.
+
+## Run from the prebuilt binary
+
+### Download the prebuilt binary
+
+Visit https://github.com/aoraki-labs/zkpool-prover/releases and download the latest release or use wget command like below. 
+Please ensure that you select the appropriate tar file for your hardware and the correct release version.
+```
+   wget https://github.com/aoraki-labs/zkpool-prover/releases/download/v1.0/x86_64-unknown-linux-musl.tar.gz
+   tar -zxvf x86_64-unknown-linux-musl.tar.gz
+```
+
+### Download the running script
+
+Download the script from https://github.com/aoraki-labs/zkpool-prover/run_prover.sh
+
+### Run
+
+Modify the ./run-prover.sh according to your own config.
+```
+ACCESS_KEY=123456789 #replace the parameter with what we get in zkpool.io
+DEVICE_ID=123456789 #replace the parameter with the id name you want to set
+```
+
+Run like this:
+```
+   ./run-prover.sh
+```
+
+## Build from source and run
+
+### Preparation
+
+Download codes via `git clone`. Make sure you have installed rustup, cargo and Go.
+
+### Build
 
 Run `cargo build --release` to build the binary.
+And then, 
+`cp ./target/release/zkpool-prover .`
 
+### Run
 
-## Usage
-
-Please refer to the usage help (`target/release/zkpool-prover --help`):
-
-
-### CPU version
-1.run from the run-prover.sh
+Modify the ./run-prover.sh according to your own config.
 ```
-   ./run-prover.sh  #REMIND to replace the parameter in the script by your own,below is the explaination:
-```
-```
--k: the prover access key
--u: the prover device id (optional,program will generate one automatically if not set )
--p: the zkpool scheduler pool address
-you can replace it by your own config
+ACCESS_KEY=123456789 #replace the parameter with what we get in zkpool.io
+DEVICE_ID=123456789 #replace the parameter with the id name you want to set
 ```
 
-2.run from release binary
+Run like this:
 ```
-   #Download the binary from the release page:<https://github.com/aoraki-labs/zkpool-prover/releases>,for example:
-   wget https://github.com/aoraki-labs/zkpool-prover/releases/download/v1.0/x86_64-unknown-linux-musl.tar.gz 
-   tar -zxvf x86_64-unknown-linux-musl.tar.gz
-
-   #Download the param file If not done,otherwise ignore it
-   wget https://storage.googleapis.com/zkevm-circuits-keys/19.bin -P ./
-   wget https://storage.googleapis.com/zkevm-circuits-keys/21.bin -P ./
-   wget https://storage.googleapis.com/zkevm-circuits-keys/kzg_bn254_21.srs -P ./
-
-   #Run
-   ./zkpool-prover -k 123456789 -u 123456789 -p 35.201.232.215:18081 #replace the parameter with your own,refer to the upper explaination 
-
+   ./run-prover.sh
 ```
+You can also see more detail in run-prover.sh and refer to the usage help (`./zkpool-prover --help`):
 
 
 ## License

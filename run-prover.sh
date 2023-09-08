@@ -1,8 +1,7 @@
 #!/bin/bash
-
-cargo build --release
-
-cd ./target/release/
+ACCESS_KEY=123456789 #replace the parameter with what we get in zkpool.io
+DEVICE_ID=123456789 #replace the parameter with the id name you want to set
+POOL_ENDPOINT=lb-l9v5oowm-7dniy23pbxa4sqlz.clb.na-siliconvalley.tencentclb.com:18081 
 
 if [ ! -f "./19.bin" ];then
     wget https://storage.googleapis.com/zkevm-circuits-keys/19.bin -P ./
@@ -20,4 +19,4 @@ else
     echo "kzg parameter kzg_bn254_21.srs exist"
 fi
 
- ./zkpool-prover -k 123456789 -u 123456789 -p 35.201.232.215:18081 #replace the parameter with your own
+ ./zkpool-prover -k $ACCESS_KEY -u $DEVICE_ID -p $POOL_ENDPOINT

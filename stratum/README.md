@@ -2,7 +2,7 @@
  
 ## Introduction
 
-This module comes from https://github.com/HarukaMa/aleo-pool-server/tree/testnet3-new/stratum.
+This module derives from https://github.com/HarukaMa/aleo-pool-server/tree/testnet3-new/stratum.
 And there is some modification by Aoraki-Labs team.
 
 ## Tracing changes

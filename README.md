@@ -46,6 +46,7 @@ DEVICE_ID=123456789 #replace the parameter with the id name you want to set
 
 Run like this:
 ```
+   chmod +x ./run-prover.sh
    ./run-prover.sh
 ```
 
@@ -71,6 +72,7 @@ DEVICE_ID=123456789 #replace the parameter with the id name you want to set
 
 Run like this:
 ```
+   chmod +x ./run-prover.sh
    ./run-prover.sh
 ```
 You can also see more detail in run-prover.sh and refer to the usage help (`./zkpool-prover --help`):

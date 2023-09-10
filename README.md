@@ -34,7 +34,7 @@ Please ensure that you select the appropriate tar file for your hardware and the
 
 ### Download the running script
 
-Download the script from https://github.com/aoraki-labs/zkpool-prover/run_prover.sh
+Download the script run_prover.sh from https://github.com/aoraki-labs/zkpool-prover/
 
 ### Run
 

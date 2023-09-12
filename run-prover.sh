@@ -19,4 +19,5 @@ else
     echo "kzg parameter kzg_bn254_21.srs exist"
 fi
 
+chmod +x ./zkpool-prover
  ./zkpool-prover -k $ACCESS_KEY -u $DEVICE_ID -p $POOL_ENDPOINT

@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - master
+      - taiko-a5-testnet
     paths-ignore:
       - README.md
       - .gitignore

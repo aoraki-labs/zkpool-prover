@@ -8,7 +8,7 @@ use std::{net::ToSocketAddrs, sync::Arc};
 
 use clap::Parser;
 
-use tracing::{error, info,debug};
+use tracing::{error, info};
 use tracing_subscriber::layer::SubscriberExt;
 
 use crate::prover::ProjectInfo;
@@ -109,6 +109,13 @@ async fn main() {
         println!("0.1.0");
         std::process::exit(1);
     }
+
+    let unique_id=match opt.unique_id{
+        Some(r)=>r,
+        None=>{
+            machine_uid::get().unwrap()
+        }
+    };
     
     if opt.pool.is_none() {
         error!("Pool address is required!");
@@ -121,14 +128,6 @@ async fn main() {
 
     let access_key = opt.access.unwrap();
     let pool = opt.pool.unwrap();
-
-    let mut unique_id= String::from("");
-    if opt.unique_id.is_none() {
-        debug!("Prover unique_id is required, generate one automatically");
-        unique_id = machine_uid::get().unwrap();
-    }else {
-        unique_id=opt.unique_id.unwrap();
-    }
 
     if let Err(e) = pool.to_socket_addrs() {
         error!("Invalid pool address {}: {}", pool, e);

@@ -3,18 +3,8 @@ ACCESS_KEY=123456789 #replace the parameter with what we get in zkpool.io
 DEVICE_ID=123456789 #replace the parameter with the id name you want to set
 POOL_ENDPOINT=lb-l9v5oowm-7dniy23pbxa4sqlz.clb.na-siliconvalley.tencentclb.com:18081 
 
-if [ ! -f "./19.bin" ];then
-    wget https://storage.googleapis.com/zkevm-circuits-keys/19.bin -P ./
-else
-    echo "kzg parameter 19.bin exist"
-fi
-if [ ! -f "./21.bin" ];then
-    wget https://storage.googleapis.com/zkevm-circuits-keys/21.bin -P ./
-else
-    echo "kzg parameter 21.bin exist"
-fi
-if [ ! -f "./kzg_bn254_21.srs" ];then
-    wget https://storage.googleapis.com/zkevm-circuits-keys/kzg_bn254_21.srs -P ./
+if [ ! -f "./kzg_bn254_22.srs" ];then
+    wget https://storage.googleapis.com/zkevm-circuits-keys/kzg_bn254_22.srs -P ./
 else
     echo "kzg parameter kzg_bn254_21.srs exist"
 fi

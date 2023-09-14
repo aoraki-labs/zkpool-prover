@@ -37,25 +37,15 @@ serde = { version = "1.0.136", features = ["derive"] }
 [dependencies.taiko-stratum]
 path = "./stratum"
 
-#taiko A4 testnet core lib
+#taiko A5 testnet core lib
 [dependencies.prover]
 git = "https://github.com/aoraki-labs/taiko-prover-core"
-branch = "taiko-a4-final"
+branch = "taiko-a5-final"
 package = "prover"
 [dependencies.zkevm_common]
 git = "https://github.com/aoraki-labs/taiko-prover-core"
-branch = "taiko-a4-final"
+branch = "taiko-a5-final"
 package = "zkevm_common"
-
-#taiko A3 testnet core lib
-[dependencies.a3_prover]
-git = "https://github.com/aoraki-labs/taiko-prover-core"
-branch = "taiko-a3"
-package = "a3_prover"
-[dependencies.a3_zkevm_common ]
-git = "https://github.com/aoraki-labs/taiko-prover-core"
-branch = "taiko-a3"
-package = "a3_zkevm_common"
 
 
 [dependencies.clap]

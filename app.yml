@@ -1,9 +1,9 @@
 name_list:
   - taikoA4
-  - taikoA3
+  - taikoA5
 
 rpc_url_list:
   - https://rpc.l3test.taiko.xyz
-  - https://rpc.test.taiko.xyz/
+  - https://rpc.jolnir.taiko.xyz/
 
 

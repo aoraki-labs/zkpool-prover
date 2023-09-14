@@ -6,7 +6,7 @@ POOL_ENDPOINT=lb-l9v5oowm-7dniy23pbxa4sqlz.clb.na-siliconvalley.tencentclb.com:1
 if [ ! -f "./kzg_bn254_22.srs" ];then
     wget https://storage.googleapis.com/zkevm-circuits-keys/kzg_bn254_22.srs -P ./
 else
-    echo "kzg parameter kzg_bn254_21.srs exist"
+    echo "kzg parameter kzg_bn254_22.srs exist"
 fi
 
 chmod +x ./zkpool-prover

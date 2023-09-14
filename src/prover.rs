@@ -141,7 +141,7 @@ impl Prover {
 
         info!("receive task,project name is:{},task id is:{},task content is:{}",project_name.clone(),block,task_content);
 
-        if project_name.clone()=="taikoA4".to_string(){
+        if project_name.clone()=="taikoA5".to_string(){
             let l2_rpc = project_info.rpc_url;
             let task_vec: Vec<&str> = task_content.split("#").collect(); //Parse the task content
             if task_vec.len() != 14{
@@ -227,9 +227,8 @@ impl Prover {
                 let mut queue = task_handle_vec.lock().await;
                 queue.push(task_handle);
             });
-        }else if project_name=="taikoA3".to_string(){
+        }else{
             info!("ignore the unrecognized {} task",project_name);
-            
         }
         info!("******one block task in process********");
     }

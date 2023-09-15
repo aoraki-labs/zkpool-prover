@@ -2717,7 +2717,7 @@ dependencies = [
 [[package]]
 name = "prover"
 version = "0.1.0"
-source = "git+https://github.com/aoraki-labs/taiko-prover-core?branch=taiko-a5-final#3d5e515f9423f8526570d40086eb859886cbbc9f"
+source = "git+https://github.com/aoraki-labs/taiko-prover-core?branch=taiko-a5-final#6dfa8fe80730de04db9d9b6a1ae62e38703599ce"
 dependencies = [
  "bus-mapping",
  "circuit-benchmarks",
@@ -4470,7 +4470,7 @@ dependencies = [
 [[package]]
 name = "zkevm_common"
 version = "0.1.0"
-source = "git+https://github.com/aoraki-labs/taiko-prover-core?branch=taiko-a5-final#3d5e515f9423f8526570d40086eb859886cbbc9f"
+source = "git+https://github.com/aoraki-labs/taiko-prover-core?branch=taiko-a5-final#6dfa8fe80730de04db9d9b6a1ae62e38703599ce"
 dependencies = [
  "eth-types",
  "hex",

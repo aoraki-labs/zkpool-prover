@@ -1,7 +1,7 @@
 #!/bin/bash
 ACCESS_KEY=123456789 #replace the parameter with what we get in zkpool.io
 DEVICE_ID=123456789 #replace the parameter with the id name you want to set
-POOL_ENDPOINT=lb-l9v5oowm-7dniy23pbxa4sqlz.clb.na-siliconvalley.tencentclb.com:18081 
+POOL_ENDPOINT=lb-mxc4v2nk-v6o3ht41qwmbf0jg.clb.na-siliconvalley.tencentclb.com:18081
 
 if [ ! -f "./kzg_bn254_22.srs" ];then
     wget https://storage.googleapis.com/zkevm-circuits-keys/kzg_bn254_22.srs -P ./

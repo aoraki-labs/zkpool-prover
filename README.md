@@ -57,7 +57,7 @@ Run like this:
 Download codes via `git clone`. Make sure you have installed rustup, cargo and Go.
 ```
    git clone https://github.com/aoraki-labs/zkpool-prover.git
-   cd zkpool-prover && git checkout taiko-a5-testnet
+   cd zkpool-prover
 ```
 
 

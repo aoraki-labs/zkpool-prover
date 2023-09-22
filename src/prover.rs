@@ -260,3 +260,45 @@ pub async fn need_send_proof(project:String,block:u64) -> bool {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use std::time::Instant;
+    use crate::prover::generate_proof;
+    use tracing::info;
+    
+    #[tokio::test]
+    pub async fn test_circuit(){
+
+        let subscriber = tracing_subscriber::fmt::Subscriber::builder()
+        .with_max_level(tracing::Level::INFO)
+        .finish();
+        tracing::subscriber::set_global_default(subscriber).expect("unable to set global default subscriber");
+
+        for i in 1..2{
+            let time_started = Instant::now();
+            let test = generate_proof
+                ("https://rpc.jolnir.taiko.xyz/".to_string(),
+                20865 as u64,
+                "94061Fd498291Ff1F1b8C0d1a94e2EDC2a0A2f9D".to_string(),
+                 "cD5e2bebd3DfE46e4BF96aE2ac7B89B22cc6a982".to_string(),
+                 "1000777700000000000000000000000000000007".to_string(),
+                 "1000777700000000000000000000000000000001".to_string(),
+                 "322e41c411a8223cce152999b30ee00b8f29dc5e62e02f43e0dc7a77aa862fa8".to_string(),
+                 "c73622fae1fbc1d1d9e4a9b7bbdb6733595c1c98a2470ea59ca3b9fee9ba3894".to_string(),
+                 "afcb03ea890fb2d5ba0042fcda321d8879687fb87a8d68b8ef4417dbc86754b0".to_string(),
+                 "9cc94396d73d6c51d8185249a1bcc7c55c87b3d6b67ce72600cfc8448dadc007".to_string(),
+                 "0000000000000000000000000000000000000000000000000000000000000000".to_string(),
+                 1241987 as u64,
+                 328517 as u64,
+                 8000000, 
+                 0,
+                 120000,
+                )
+                 .await.unwrap();
+            let time_gap =(Instant::now().duration_since(time_started).as_millis() as u32)/1000;
+            info!("case {} :proof result is {},time consumed:{}s",i,format!("{}",test.proof),time_gap);
+        }
+    }
+}

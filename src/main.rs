@@ -106,7 +106,7 @@ async fn main() {
 
     
     if opt.version {
-        println!("0.1.0");
+        println!("0.1.1");
         std::process::exit(1);
     }
 

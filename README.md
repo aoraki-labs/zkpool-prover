@@ -82,6 +82,16 @@ Run like this:
 ```
 You can also see more detail in run-prover.sh and refer to the usage help (`./zkpool-prover --help`):
 
+## Test
+
+### Run TestCase (one a5 proof task in actuality)
+
+```
+wget https://storage.googleapis.com/zkevm-circuits-keys/kzg_bn254_22.srs -P ./
+cargo test --release -- --nocapture
+```
+
+
 
 ## License
 

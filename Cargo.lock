@@ -4470,7 +4470,7 @@ dependencies = [
 [[package]]
 name = "zkevm_common"
 version = "0.1.0"
-source = "git+https://github.com/aoraki-labs/taiko-prover-core?branch=taiko-a5-final#6dfa8fe80730de04db9d9b6a1ae62e38703599ce"
+source = "git+https://github.com/aoraki-labs/taiko-prover-core?branch=taiko-a5-final#45967193fbe5ee8e86ef63e8b337348ddd43972c"
 dependencies = [
  "eth-types",
  "hex",

@@ -7,7 +7,7 @@ use json_rpc_types::{Id, Request, Response, Version};
 use serde::{ser::SerializeSeq, Deserialize, Serialize};
 use serde_json::Value;
 use tokio_util::codec::{AnyDelimiterCodec, Decoder, Encoder};
-use tracing::debug;
+use tracing::info;
 
 use crate::message::StratumMessage;
 
@@ -25,18 +25,11 @@ impl Default for StratumCodec {
     }
 }
 
-// CHANGE(zkpool): use custom StratumMessage type
 #[derive(Serialize, Deserialize)]
-struct NotifyParams(String,u64,String,u64);
+struct NotifyParams(String, u64, u64, String, Option<String>, bool);
 
 #[derive(Serialize, Deserialize)]
-struct SubmitParams(String,String, String,u8,u32);
-
-#[derive(Serialize, Deserialize)]
-struct HeartBeatParams(String, String);
-
-#[derive(Serialize, Deserialize)]
-struct SubscribeParams(String, String,u64,u64,u64);
+struct SubscribeParams(String, String, Option<String>);
 
 pub trait BoxedType: ErasedSerialize + Send + DowncastSync {}
 erased_serde::serialize_trait_object!(BoxedType);
@@ -95,17 +88,16 @@ impl<'de> Deserialize<'de> for ResponseParams {
     }
 }
 
-// CHANGE(zkpool): use custom StratumMessage protocol and name 
 impl Encoder<StratumMessage> for StratumCodec {
     type Error = io::Error;
 
     fn encode(&mut self, item: StratumMessage, dst: &mut BytesMut) -> Result<(), Self::Error> {
         let bytes = match item {
-            StratumMessage::Subscribe(id, user_agent, protocol_version, machine_cpu_num,machine_gpu_num,machine_mem) => {
+            StratumMessage::Subscribe(id, user_agent, protocol_version, session_id) => {
                 let request = Request {
                     jsonrpc: Version::V2,
-                    method: "zkpool.subscribe",
-                    params: Some(SubscribeParams(user_agent, protocol_version,machine_cpu_num,machine_gpu_num,machine_mem)),
+                    method: "mining.subscribe",
+                    params: Some(SubscribeParams(user_agent, protocol_version, session_id)),
                     id: Some(id),
                 };
                 serde_json::to_vec(&request).unwrap_or_default()
@@ -113,46 +105,41 @@ impl Encoder<StratumMessage> for StratumCodec {
             StratumMessage::Authorize(id, worker_name, worker_password) => {
                 let request = Request {
                     jsonrpc: Version::V2,
-                    method: "zkpool.authorize",
+                    method: "mining.authorize",
                     params: Some(vec![worker_name, worker_password]),
                     id: Some(id),
                 };
                 serde_json::to_vec(&request).unwrap_or_default()
             }
-            // StratumMessage::Notify(_,block_id, address, propose_tx,clean) => {
-                StratumMessage::Notify(_,id_name,task_id,task_content,degree) => {
+            StratumMessage::Notify(job_id, epoch_number, difficulty, epoch_challenge, address, clean_jobs) => {
                 let request = Request {
                     jsonrpc: Version::V2,
-                    method: "zkpool.notify",
-                    params: Some(NotifyParams(id_name,task_id,task_content,degree)),
+                    method: "mining.notify",
+                    params: Some(NotifyParams(job_id, epoch_number, difficulty, epoch_challenge, address, clean_jobs)),
                     id: None,
                 };
                 serde_json::to_vec(&request).unwrap_or_default()
             }
-            StratumMessage::Heartbeat(id, project_name,block) => {
+            StratumMessage::Submit(id, job_id, provesolution) => {
                 let request = Request {
                     jsonrpc: Version::V2,
-                    method: "zkpool.heartbeat",
-                    params: Some(HeartBeatParams(project_name,block)),
+                    method: "mining.submit",
+                    params: Some(vec![job_id, provesolution]),
                     id: Some(id),
                 };
                 serde_json::to_vec(&request).unwrap_or_default()
             }
-            StratumMessage::Submit(id, project_name,block, proof,degree,time) => {
-                let request = Request {
-                    jsonrpc: Version::V2,
-                    method: "zkpool.submit",
-                    params: Some(SubmitParams(project_name,block, proof,degree,time)),
-                    id: Some(id),
-                };
-                serde_json::to_vec(&request).unwrap_or_default()
-            }
-            StratumMessage::Response(id, result, _) =>  {
-                let response = Response::<Option<ResponseParams>, ()>::result(Version::V2, result, Some(id));
-                serde_json::to_vec(&response).unwrap_or_default()
+            StratumMessage::Response(id, result, error) => match error {
+                Some(error) => {
+                    let response = Response::<(), ()>::error(Version::V2, error, Some(id));
+                    serde_json::to_vec(&response).unwrap_or_default()
+                }
+                None => {
+                    let response = Response::<Option<ResponseParams>, ()>::result(Version::V2, result, Some(id));
+                    serde_json::to_vec(&response).unwrap_or_default()
+                }
             },
         };
-
         let string =
             std::str::from_utf8(&bytes).map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))?;
         self.codec
@@ -169,6 +156,13 @@ fn unwrap_str_value(value: &Value) -> Result<String, io::Error> {
     }
 }
 
+fn unwrap_bool_value(value: &Value) -> Result<bool, io::Error> {
+    match value {
+        Value::Bool(b) => Ok(*b),
+        _ => Err(io::Error::new(io::ErrorKind::InvalidData, "Param is not bool")),
+    }
+}
+
 fn unwrap_u64_value(value: &Value) -> Result<u64, io::Error> {
     match value {
         Value::Number(n) => Ok(n
@@ -178,7 +172,6 @@ fn unwrap_u64_value(value: &Value) -> Result<u64, io::Error> {
     }
 }
 
-// CHANGE(zkpool): use custom StratumMessage protocol and name 
 impl Decoder for StratumCodec {
     type Error = io::Error;
     type Item = StratumMessage;
@@ -203,8 +196,8 @@ impl Decoder for StratumCodec {
         if !json.is_object() {
             return Err(io::Error::new(io::ErrorKind::InvalidData, "Not an object"));
         }
-        debug!(" help debug :New json with no error: {}", json.to_string());
-        
+        info!("New json with no error: {}", json.to_string());
+
         let result = if object.contains_key("method") {
             let request = serde_json::from_value::<Request<Vec<Value>>>(json)
                 .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))?;
@@ -215,63 +208,55 @@ impl Decoder for StratumCodec {
                 None => return Err(io::Error::new(io::ErrorKind::InvalidData, "No params")),
             };
             match method {
-                "zkpool.subscribe" => {
-                    if params.len() != 5 {
+                "mining.subscribe" => {
+                    if params.len() != 3 {
                         return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid params"));
                     }
                     let user_agent = unwrap_str_value(&params[0])?;
                     let protocol_version = unwrap_str_value(&params[1])?;
-                    let machine_cpu_num = params[2].as_u64().unwrap();
-                    let machine_gpu_num = params[3].as_u64().unwrap();
-                    let machine_mem = params[4].as_u64().unwrap();
+                    let session_id = match &params[2] {
+                        Value::String(s) => Some(s),
+                        Value::Null => None,
+                        _ => return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid params")),
+                    };
                     StratumMessage::Subscribe(
                         id.unwrap_or(Id::Num(0)),
                         user_agent,
                         protocol_version,
-                        machine_cpu_num,
-                        machine_gpu_num,
-                        machine_mem,
+                        session_id.cloned(),
                     )
                 }
-                "zkpool.authorize" => {
-                    if params.len() != 3 {
+                "mining.authorize" => {
+                    if params.len() != 2 {
                         return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid params"));
                     }
                     let worker_name = unwrap_str_value(&params[0])?;
                     let worker_password = unwrap_str_value(&params[1])?;
                     StratumMessage::Authorize(id.unwrap_or(Id::Num(0)), worker_name, worker_password)
                 }
-                "zkpool.heartbeat" => {
-                    if params.len() != 1 {
+                "mining.notify" => {
+                    if params.len() != 6 {
                         return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid params"));
                     }
-                    let project_name = unwrap_str_value(&params[0])?;
-                    let block = unwrap_u64_value(&params[1])?;
-                    StratumMessage::Heartbeat(id.unwrap_or(Id::Num(0)), project_name,block.to_string())
+                    let job_id = unwrap_str_value(&params[0])?;
+                    let epoch_number = unwrap_u64_value(&params[1])?;
+                    let difficulty = unwrap_u64_value(&params[2])?;
+                    let epoch_challenge = unwrap_str_value(&params[3])?;
+                    let address = match &params[4] {
+                        Value::String(s) => Some(s),
+                        Value::Null => None,
+                        _ => return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid params")),
+                    };
+                    let clean_jobs = unwrap_bool_value(&params[5])?;
+                    StratumMessage::Notify(job_id, epoch_number, difficulty, epoch_challenge, address.cloned(), clean_jobs)
                 }
-
-                "zkpool.notify" => {
-                    if params.len() != 4 {
+                "mining.submit" => {
+                    if params.len() != 3 {
                         return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid params"));
                     }
-                    let project_name = unwrap_str_value(&params[0])?;
-                    // let task_id = unwrap_u64_value(&params[1])?;
-                    let task_id =  (unwrap_str_value(&params[1])?).parse::<u64>().unwrap();
-                    let task_content = unwrap_str_value(&params[2])?;
-                    // let degree = unwrap_u64_value(&params[3])?;
-                    let degree =  (unwrap_str_value(&params[3])?).parse::<u64>().unwrap();
-                    StratumMessage::Notify(id.unwrap(),project_name,task_id,task_content,degree)
-                }
-                "zkpool.submit" => {
-                    if params.len() != 5 { 
-                        return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid params"));
-                    }
-                    let project_name = unwrap_str_value(&params[0])?;
-                    let block = unwrap_str_value(&params[1])?;
-                    let proof = unwrap_str_value(&params[2])?;
-                    let degree = unwrap_u64_value(&params[3])? as u8;
-                    let time = unwrap_u64_value(&params[4])?;
-                    StratumMessage::Submit(id.unwrap_or(Id::Num(0)), project_name,block, proof,degree,time as u32)
+                    let job_id = unwrap_str_value(&params[0])?;
+                    let provesolution = unwrap_str_value(&params[1])?;
+                    StratumMessage::Submit(id.unwrap_or(Id::Num(0)), job_id, provesolution)
                 }
                 _ => {
                     return Err(io::Error::new(io::ErrorKind::InvalidData, "Unknown method"));

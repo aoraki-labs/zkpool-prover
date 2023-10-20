@@ -1,5 +1,5 @@
 [package]
-name = "taiko-stratum"
+name = "aleo-stratum"
 version = "1.0.0"
 edition = "2021"
 

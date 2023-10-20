@@ -1,13 +1,12 @@
 use std::{sync::Arc, time::Duration};
-use std::sync::atomic::{AtomicBool};
 
-use taiko_stratum::{
-    codec::StratumCodec,
+use aleo_stratum::{
+    codec::{ResponseParams, StratumCodec},
     message::StratumMessage,
 };
-use taiko_stratum::codec::ResponseParams;
 use futures_util::sink::SinkExt;
 use json_rpc_types::Id;
+use snarkvm::{prelude::Testnet3,  prelude::FromBytes};
 use tokio::{
     net::TcpStream,
     sync::{
@@ -20,29 +19,28 @@ use tokio::{
 };
 use tokio_stream::StreamExt;
 use tokio_util::codec::Framed;
-use tracing::{error, info, warn, debug};
+use tracing::{debug, error, info};
+
+use snarkvm::prelude::coinbase::EpochChallenge;
+
 use crate::prover::ProverEvent;
-use crate::prover::LATEST_TASK_CONTENT;
-use crate::prover::TASK_HANDLER;
 
 pub struct Client {
     pub name: String ,
     pub server: String,
     pub uuid:String,
     pub sender: Arc<Sender<StratumMessage>>,
-    pub busy: Arc<AtomicBool>,
     pub receiver: Arc<Mutex<Receiver<StratumMessage>>>,
 }
 
 impl Client {
     pub fn init(name: String, device_id:String,server: String) -> Arc<Self> {
-        let (sender, receiver) = mpsc::channel(4096);
+        let (sender, receiver) = mpsc::channel(1024);
         Arc::new(Self {
             name,
             server,
             uuid:device_id,
             sender: Arc::new(sender),
-            busy:  Arc::new(AtomicBool::new(false)),
             receiver: Arc::new(Mutex::new(receiver)),
         })
     }
@@ -56,45 +54,75 @@ impl Client {
     }
 }
 
-pub async fn start(prover_sender: Arc<Sender<ProverEvent>>, client: Arc<Client>) {
-
+pub fn start(prover_sender: Arc<Sender<ProverEvent>>, client: Arc<Client>) {
     task::spawn(async move {
         let receiver = client.receiver();
         let mut id = 1;
+        let mut server_prefix: Option<String> = None;
+        server_prefix = server_prefix.clone();
         loop {
             info!("Connecting to server...");
-
+            server_prefix = server_prefix.clone();
             match timeout(Duration::from_secs(10), TcpStream::connect(&client.server)).await {
                 Ok(socket) => match socket {
                     Ok(socket) => {
                         info!("Connected to {}", client.server);
                         let mut framed = Framed::new(socket, StratumCodec::default());
+                        let _pool_address: Option<String> = None;
 
-                        //step1:send Subscribe msg
                         let handshake = StratumMessage::Subscribe(
                             Id::Num(id),
-                            "test".to_string(),
-                            "test".to_string(),
-                            2, //just for test
-                            4,
-                            6,
+                            format!("ZKPoolProver/{}", env!("CARGO_PKG_VERSION")),
+                            "AleoStratum/2.0.0".to_string(),
+                            None,
                         );
                         id += 1;
                         if let Err(e) = framed.send(handshake).await {
                             error!("Error sending handshake: {}", e);
                         } else {
-                            info!("Send handshake msg over");
+                            info!("Sent handshake over");
                         }
-
                         match framed.next().await {
                             None => {
                                 error!("Unexpected end of stream");
-                                sleep(Duration::from_secs(2)).await;
+                                sleep(Duration::from_secs(5)).await;
                                 continue;
                             }
                             Some(Ok(message)) => match message {
-                                StratumMessage::Response(_, _, result) => {
-                                    info!("Handshake successful,result is {:?}",result);
+                                StratumMessage::Response(_, params, _) => {
+                                    match params {
+                                        Some(ResponseParams::Array(array)) => {
+                                            if let Some(prefix) = array.get(1) {
+                                                if let Some(prefix) = prefix.downcast_ref::<String>() {
+                                                    server_prefix = Some(prefix.to_string().clone());
+                                                    if let Some(prefix_length) = array.get(2) {
+                                                        if let Some(prefix_length) = prefix_length.downcast_ref::<Option<u64>>() {
+                                                            info!("prefix is {}, length is {}", prefix, prefix_length.unwrap());
+                                                        }
+                                                    }
+                                                } else {
+                                                    error!("Invalid type for prefix");
+                                                    sleep(Duration::from_secs(5)).await;
+                                                    continue;
+                                                }
+                                            } else {
+                                                error!("Invalid handshake response");
+                                                sleep(Duration::from_secs(5)).await;
+                                                continue;
+                                            }
+                                        }
+                                        None => {
+                                            error!("No handshake response");
+                                            sleep(Duration::from_secs(5)).await;
+                                            continue;
+                                        }
+                                        _ => {
+                                            error!("Invalid handshake response");
+                                            sleep(Duration::from_secs(5)).await;
+                                            continue;
+                                        }
+                                    }
+                                    info!("Handshake successful");
                                 }
                                 _ => {
                                     error!("Unexpected message: {:?}", message.name());
@@ -102,26 +130,24 @@ pub async fn start(prover_sender: Arc<Sender<ProverEvent>>, client: Arc<Client>)
                             },
                             Some(Err(e)) => {
                                 error!("Error receiving handshake: {}", e);
-                                sleep(Duration::from_secs(2)).await;
+                                sleep(Duration::from_secs(5)).await;
                                 continue;
                             }
                         }
-
-                        //step2:send Authorize msg
                         let worker_access_key = client.name.clone();
                         let uuid = client.uuid.clone();
                         let authorization =
-                            StratumMessage::Authorize(Id::Num(id), worker_access_key, uuid); //access_key + uuid
+                            StratumMessage::Authorize(Id::Num(id), worker_access_key, uuid);
                         id += 1;
                         if let Err(e) = framed.send(authorization).await {
                             error!("Error sending authorization: {}", e);
                         } else {
-                            info!("Sent authorization msg over");
+                            debug!("Sent authorization");
                         }
                         match framed.next().await {
                             None => {
                                 error!("Unexpected end of stream");
-                                sleep(Duration::from_secs(2)).await;
+                                sleep(Duration::from_secs(5)).await;
                                 continue;
                             }
                             Some(Ok(message)) => match message {
@@ -134,100 +160,80 @@ pub async fn start(prover_sender: Arc<Sender<ProverEvent>>, client: Arc<Client>)
                             },
                             Some(Err(e)) => {
                                 error!("Error receiving authorization: {}", e);
-                                sleep(Duration::from_secs(2)).await;
+                                sleep(Duration::from_secs(5)).await;
                                 continue;
                             }
                         }
-
-                        // step3:send Heartbeat msg
-                        info!("send heartbeat to server when startup");
-    
-                 
-                        let heartbeat = StratumMessage::Heartbeat(Id::Num(id),String::from(""),String::from("")); //initial heartbeat
-                        if let Err(e) = framed.send(heartbeat).await {
-                                error!("Error sending heartbeat in startup: {}", e);
-                            } else {
-                                info!("Sent heartbeat msg over");
-                        }
-    
-
                         let receiver = &mut *receiver.lock().await;
-                        let mut heartbeat_interval = tokio::time::interval(Duration::from_secs(3));
                         loop {
                             tokio::select! {
-                                //process the msg send by prover
-                                Some(message) = receiver.recv() => { 
+                                Some(message) = receiver.recv() => {
                                     // let message = message.clone();
                                     let name = message.name();
+                                    info!("Sending {} to server", name);
                                     if let Err(e) = framed.send(message).await {
                                         error!("Error sending {}: {:?}", name, e);
-                                        cancel_task().await;
                                     }
                                 }
-
-                                _ = heartbeat_interval.tick() => {
-                                    let task = LATEST_TASK_CONTENT.lock().await;
-                                    let task_current = (*task).clone();
-                                    let heart_msg: Vec<&str> =task_current.split("#").collect();
-                                    if heart_msg.len()==2 {
-                                        let heartbeat = StratumMessage::Heartbeat(Id::Num(id),heart_msg[0].to_string(),heart_msg[1].to_string());  
-                                        if let Err(e) = framed.send(heartbeat).await {
-                                            error!("Error sending heartbeat in loop: {}", e);
-                                            cancel_task().await;
-                                        } else {
-                                            info!("Loop Sent {} heartbeat msg over block :{}",heart_msg[0].to_string(),heart_msg[1].to_string());
-                                        }
-                                    }else {
-                                        let heartbeat = StratumMessage::Heartbeat(Id::Num(id),String::from(""),String::from("")); //initial heartbeat
-                                        if let Err(e) = framed.send(heartbeat).await {
-                                                error!("Error sending heartbeat in startup: {}", e);
-                                        } else {
-                                                info!("Sent heartbeat msg over no any task");
-                                        }
-                                    }
-                                }
-                             
-                                //process the msg from server
                                 result = framed.next() => match result {
                                     Some(Ok(message)) => {
-                                        debug!("Received {:?} from server", message.name());
+                                        debug!("Received {} from server", message.name());
                                         match message {
-                                            StratumMessage::Notify(id, project_name,task_id,task_content,_) => { 
-                                                info!("zkpool : receive {} task of {}",project_name.clone(),task_id);
-                                                let resp = StratumMessage::Response(id,Some(ResponseParams::Bool(true)),Some(json_rpc_types::Error::from_code(json_rpc_types::ErrorCode::ServerError(1)))); 
-                                                if let Err(e) = framed.send(resp).await {
-                                                    error!("Error send  notify Response: {}", e);
-                                                    cancel_task().await;
-                                                } else {
-                                                    debug!("Send notify Response Msg Over");
+                                            StratumMessage::Response(_, result, _error) => {
+                                                match result {
+                                                    Some(params) => {
+                                                        match params {
+                                                            ResponseParams::Bool(_result) => {
+                                                                debug!("receive zkpool Response msg");
+                                                            }
+                                                            _ => {
+                                                                debug!("Unexpected response params");
+                                                            }
+                                                        }
+                                                    }
+                                                    None => {
+                                                        debug!("receive None msg");
+                                                    }
                                                 }
-
-                                                //parse parameter
-                                                if let Err(e) = prover_sender.send(ProverEvent::NewWork(project_name.clone(),task_id,task_content)).await {
+                                            }
+                                            StratumMessage::Notify(job_id, epoch_number, difficulty, epoch_challenge, address, _) => {
+                                                let job_id_bytes = job_id.as_bytes();
+                                                if job_id_bytes.len() != 10 {
+                                                    error!("Unexpected job_id length: {}", job_id_bytes.len());
+                                                    continue;
+                                                }
+                                                let my_server_prefix = server_prefix.clone();
+                                                let epoch_challenge_hex_byte = match hex::decode(epoch_challenge){
+                                                    Ok(r) => r,
+                                                    Err(_) => {
+                                                        info!("invalid epoch_challenge_hex_byte");
+                                                        continue
+                                                    },
+                                                };
+                                                let my_epoch_challenge = match EpochChallenge::<Testnet3>::from_bytes_le(&epoch_challenge_hex_byte[..]){
+                                                    Ok(r) => r,
+                                                    Err(_) => {
+                                                        info!("can not decode epoch_challenge data:{:?}",epoch_challenge_hex_byte);
+                                                        continue
+                                                    },
+                                                };
+                                                if let Err(e) = prover_sender.send(ProverEvent::NewWork(difficulty, epoch_number, my_epoch_challenge, address.unwrap(), job_id,my_server_prefix.unwrap())).await {
                                                     error!("Error sending work to prover: {}", e);
-                                                    cancel_task().await;
                                                 } else {
-                                                    debug!("Sent work to prover");
+                                                    info!("Sent work to prover");
                                                 }
-
                                             }
                                             _ => {
-                                                debug!("ignore msg!!!");
+                                                info!("Unhandled message: {}", message.name());
                                             }
                                         }
                                     }
-                                    Some(Err(e)) => {  //case will not run
-                                        warn!("Failed to read the message: {:?}", e);
-                                        sleep(Duration::from_secs(1)).await;
+                                    Some(Err(e)) => {
+                                        info!("Failed to read the message: {:?}", e);
                                     }
                                     None => {
                                         error!("Disconnected from server");
-                                         //Clear the block task cache
-                                        let block_current = LATEST_TASK_CONTENT.clone();
-                                        let mut block_id_now = block_current.lock().await;
-                                        *block_id_now = String::from("");
-                                        cancel_task().await;
-                                        sleep(Duration::from_secs(1)).await;
+                                        sleep(Duration::from_secs(5)).await;
                                         break;
                                     }
                                 }
@@ -236,31 +242,14 @@ pub async fn start(prover_sender: Arc<Sender<ProverEvent>>, client: Arc<Client>)
                     }
                     Err(e) => {
                         error!("Failed to connect to operator: {}", e);
-                        cancel_task().await;
-                        sleep(Duration::from_secs(2)).await;
+                        sleep(Duration::from_secs(5)).await;
                     }
                 },
                 Err(_) => {
                     error!("Failed to connect to operator: Timed out");
-                    cancel_task().await;
-                    sleep(Duration::from_secs(2)).await;
+                    sleep(Duration::from_secs(5)).await;
                 }
             }
         }
     });
 }
-
-
-pub async fn cancel_task(){
-    let task_temp = TASK_HANDLER.clone();
-    let mut queue = task_temp.lock().await;
-    while queue.len() > 0 {
-        info!("clear the old task handle");
-        for i in queue.iter() {
-            i.abort();
-            drop(i)
-        }
-        queue.clear(); 
-    }
-}
-

@@ -2,32 +2,36 @@ use json_rpc_types::{Error, Id};
 
 use crate::codec::ResponseParams;
 
-// CHANGE(zkpool): use custom StratumMessage protocol
 pub enum StratumMessage {
-  
-    Subscribe(Id, String, String, u64, u64, u64),
+    /// This first version doesn't support vhosts.
+    /// (id, user_agent, protocol_version, session_id)
+    Subscribe(Id, String, String, Option<String>),
 
+    /// (id, worker_name, worker_password)
     Authorize(Id, String, String),
 
-    Notify(Id,String,u64,String,u64),
+    /// New job from the mining pool.
+    /// See protocol specification for details about the fields.
+    /// (job_id, epoch number, difficulty, epoch_challenge, address, clean_jobs)
+    Notify(String, u64, u64, String, Option<String>, bool),
 
-    Heartbeat(Id,String,String),
+    /// Submit shares to the pool.
+    /// See protocol specification for details about the fields.
+    /// (id, job_id, provesolution)
+    Submit(Id, String, String),
 
-    Submit(Id, String,String, String,u8,u32),
-
+    /// (id, result, error)
     Response(Id, Option<ResponseParams>, Option<Error<()>>),
 }
 
-// CHANGE(zkpool): use custom StratumMessage name
 impl StratumMessage {
     pub fn name(&self) -> &'static str {
         match self {
-            StratumMessage::Subscribe(..) => "zkpool.subscribe",
-            StratumMessage::Authorize(..) => "zkpool.authorize",
-            StratumMessage::Notify(..) => "zkpool.notify",
-            StratumMessage::Submit(..) => "zkpool.submit",
-            StratumMessage::Response(..) => "zkpool.response",
-            StratumMessage::Heartbeat(..) => "zkpool.heartbeat",
+            StratumMessage::Subscribe(..) => "mining.subscribe",
+            StratumMessage::Authorize(..) => "mining.authorize",
+            StratumMessage::Notify(..) => "mining.notify",
+            StratumMessage::Submit(..) => "mining.submit",
+            StratumMessage::Response(..) => "mining.response",
         }
     }
 }

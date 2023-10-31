@@ -30,7 +30,7 @@ impl Default for StratumCodec {
 struct NotifyParams(String,u64,String,u64);
 
 #[derive(Serialize, Deserialize)]
-struct SubmitParams(String,String, String,u8,u32);
+struct SubmitParams(String,String, String,u8,u32,u8);
 
 #[derive(Serialize, Deserialize)]
 struct HeartBeatParams(String, String);
@@ -138,11 +138,11 @@ impl Encoder<StratumMessage> for StratumCodec {
                 };
                 serde_json::to_vec(&request).unwrap_or_default()
             }
-            StratumMessage::Submit(id, project_name,block, proof,degree,time) => {
+            StratumMessage::Submit(id, project_name,block, proof,degree,time,status) => {
                 let request = Request {
                     jsonrpc: Version::V2,
                     method: "zkpool.submit",
-                    params: Some(SubmitParams(project_name,block, proof,degree,time)),
+                    params: Some(SubmitParams(project_name,block, proof,degree,time,status)),
                     id: Some(id),
                 };
                 serde_json::to_vec(&request).unwrap_or_default()
@@ -263,7 +263,7 @@ impl Decoder for StratumCodec {
                     StratumMessage::Notify(id.unwrap(),project_name,task_id,task_content,degree)
                 }
                 "zkpool.submit" => {
-                    if params.len() != 5 { 
+                    if params.len() != 6 { 
                         return Err(io::Error::new(io::ErrorKind::InvalidData, "Invalid params"));
                     }
                     let project_name = unwrap_str_value(&params[0])?;
@@ -271,7 +271,8 @@ impl Decoder for StratumCodec {
                     let proof = unwrap_str_value(&params[2])?;
                     let degree = unwrap_u64_value(&params[3])? as u8;
                     let time = unwrap_u64_value(&params[4])?;
-                    StratumMessage::Submit(id.unwrap_or(Id::Num(0)), project_name,block, proof,degree,time as u32)
+                    let status = unwrap_u64_value(&params[5])? as u8;
+                    StratumMessage::Submit(id.unwrap_or(Id::Num(0)), project_name,block, proof,degree,time as u32,status)
                 }
                 _ => {
                     return Err(io::Error::new(io::ErrorKind::InvalidData, "Unknown method"));

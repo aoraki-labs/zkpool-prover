@@ -168,6 +168,7 @@ impl Prover {
             let _ = task::spawn(async move { //maybe multi-thread compute task in future
     
                 let task_handle = task::spawn(async move {
+                    let mut status:u8=1;
                     let time_started = Instant::now();
                     let agg_proof_result = match generate_proof(
                     l2_rpc,
@@ -187,7 +188,10 @@ impl Prover {
                     maxtransactionsperblock,
                     maxbytespertxlist).await{
                         Ok(r) => r,
-                        Err(_) => ProofResult::default(),
+                        Err(_) => {
+                            status=0;
+                            ProofResult::default()
+                        },
                     };                  
                     let time_gap =(Instant::now().duration_since(time_started).as_millis() as u32)/1000;
                     info!("try to sumbit the block {} proof to zkpool,proof is {:?},time consumed:{}",block,agg_proof_result,time_gap);
@@ -198,8 +202,6 @@ impl Prover {
                             proofoutput=format!("{}#{}",proofoutput,var.to_string())
                         }
                         let proof_res = format!("{}#{}",proofoutput,agg_proof_result.proof);
-                    
-            
                         let message = StratumMessage::Submit(
                             Id::Num(0),
                             project_name.clone(),
@@ -207,6 +209,7 @@ impl Prover {
                             proof_res,
                             agg_proof_result.k,
                             time_gap,
+                            status,
                         );
                         if let Err(error) = client.sender().send(message).await { 
                             error!("Failed to send PoolResponse: {}", error);

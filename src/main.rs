@@ -4,6 +4,8 @@ extern crate core;
 mod client;
 mod prover;
 
+use rand::Rng;
+
 use tokio::{
     sync::mpsc,
     task::{self, JoinHandle},
@@ -112,7 +114,8 @@ async fn main() {
     });
     
         info!("*************SLEEP***********");
-        time::sleep(time::Duration::from_secs(400)).await; //estimated time
+        let mut rng = rand::thread_rng();
+        time::sleep(time::Duration::from_secs(rng.gen_range(200..400))).await; //estimated time
     
         info!("*************cancel the above task***********");
         task_handle.abort(); 

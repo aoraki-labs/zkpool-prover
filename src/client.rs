@@ -175,7 +175,7 @@ pub async fn start(prover_sender: Arc<Sender<ProverEvent>>, client: Arc<Client>)
                                             error!("Error sending heartbeat in loop: {}", e);
                                             cancel_task().await;
                                         } else {
-                                            info!("Loop Sent {} heartbeat msg over block :{}",heart_msg[0].to_string(),heart_msg[1].to_string());
+                                            info!("Loop Sent {} heartbeat msg over task :{}",heart_msg[0].to_string(),heart_msg[1].to_string());
                                         }
                                     }else {
                                         let heartbeat = StratumMessage::Heartbeat(Id::Num(id),String::from(""),String::from("")); //initial heartbeat
@@ -258,7 +258,7 @@ pub async fn cancel_task(){
         info!("clear the old task handle");
         for i in queue.iter() {
             i.abort();
-            drop(i)
+            //drop(i.to_owned())
         }
         queue.clear(); 
     }

@@ -9,11 +9,11 @@ pub enum StratumMessage {
 
     Authorize(Id, String, String),
 
-    Notify(Id,String,u64,String,u64),
+    Notify(Id,String,String,String,u64),
 
     Heartbeat(Id,String,String),
 
-    Submit(Id, String,String, String,u8,u32),
+    Submit(Id, String,String, String,u8,u32,u8),
 
     Response(Id, Option<ResponseParams>, Option<Error<()>>),
 }

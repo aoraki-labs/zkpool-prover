@@ -37,15 +37,9 @@ serde = { version = "1.0.136", features = ["derive"] }
 [dependencies.taiko-stratum]
 path = "./stratum"
 
-#taiko A5 testnet core lib
-[dependencies.prover]
-git = "https://github.com/aoraki-labs/taiko-prover-core"
-branch = "taiko-a5-final"
-package = "prover"
-[dependencies.zkevm_common]
-git = "https://github.com/aoraki-labs/taiko-prover-core"
-branch = "taiko-a5-final"
-package = "zkevm_common"
+
+[dependencies.smartcore-ml]
+path = "./../risc0/examples/smartcore-ml"
 
 
 [dependencies.clap]
@@ -53,7 +47,7 @@ version = "4.0.10"
 features = ["derive"]
 
 [dependencies.tokio]
-version = "1.16.1"
+version = "1.34.0"
 features = [
     "rt-multi-thread",
     "macros",

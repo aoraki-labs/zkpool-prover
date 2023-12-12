@@ -8,6 +8,7 @@ use std::{net::ToSocketAddrs, sync::Arc};
 
 use clap::Parser;
 
+use smartcore_ml::{generate_proof, generate_proof_test};
 use tracing::{error, info};
 use tracing_subscriber::layer::SubscriberExt;
 
@@ -104,9 +105,11 @@ async fn main() {
         tracing::subscriber::set_global_default(subscriber).expect("unable to set global default subscriber");
     }   
 
-    
+    // let test = generate_proof("5.7,2.5,5,2".to_string()).await;
+    // println!("*******:{:?}",test);
+
     if opt.version {
-        println!("0.1.0");
+        println!("0.1.1");
         std::process::exit(1);
     }
 

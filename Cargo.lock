@@ -285,6 +285,7 @@ dependencies = [
 [[package]]
 name = "bonsai-sdk"
 version = "0.5.0"
+source = "git+https://github.com/aoraki-labs/risc0?branch=zkml-demo#5980491d021bf707daa5e095b37037fa74744287"
 dependencies = [
  "reqwest",
  "serde",
@@ -654,9 +655,9 @@ checksum = "a26ae43d7bcc3b814de94796a5e736d4029efb0ee900c12e2d54c993ad1a1e07"
 
 [[package]]
 name = "elf"
-version = "0.7.3"
+version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f6e7d85896690fe195447717af8eceae0593ac2196fd42fe88c184e904406ce"
+checksum = "4445909572dbd556c457c849c4ca58623d84b27c8fff1e74b0b4227d8b90d17b"
 
 [[package]]
 name = "encoding_rs"
@@ -703,6 +704,15 @@ name = "erased-serde"
 version = "0.3.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "da96524cc884f6558f1769b6c46686af2fe8e8b4cd253bd5a3cdba8181b8e070"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "erased-serde"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a3286168faae03a0e583f6fde17c02c8b8bba2dcc2061d0f7817066e5b0af706"
 dependencies = [
  "serde",
 ]
@@ -1123,9 +1133,9 @@ dependencies = [
 
 [[package]]
 name = "itertools"
-version = "0.11.0"
+version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
+checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
 dependencies = [
  "either",
 ]
@@ -1515,9 +1525,9 @@ checksum = "dd8b5dd2ae5ed71462c540258bedcb51965123ad7e7ccf4b9a8cafaa4a63576d"
 
 [[package]]
 name = "openssl"
-version = "0.10.59"
+version = "0.10.61"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a257ad03cd8fb16ad4172fedf8094451e1af1c4b70097636ef2eac9a5f0cc33"
+checksum = "6b8419dc8cc6d866deb801274bba2e6f8f6108c1bb7fcc10ee5ab864931dbb45"
 dependencies = [
  "bitflags 2.4.1",
  "cfg-if",
@@ -1547,9 +1557,9 @@ checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
 
 [[package]]
 name = "openssl-sys"
-version = "0.9.95"
+version = "0.9.97"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40a4130519a360279579c2053038317e40eff64d13fd3f004f9e1b72b8a6aaf9"
+checksum = "c3eaad34cdd97d81de97964fc7f29e2d104f483840d906ef56daa1912338460b"
 dependencies = [
  "cc",
  "libc",
@@ -1947,9 +1957,9 @@ dependencies = [
 
 [[package]]
 name = "prost"
-version = "0.12.2"
+version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a5a410fc7882af66deb8d01d01737353cf3ad6204c408177ba494291a626312"
+checksum = "146c289cda302b98a28d40c8b3b90498d6e526dd24ac2ecea73e4e491685b94a"
 dependencies = [
  "bytes",
  "prost-derive",
@@ -1957,13 +1967,13 @@ dependencies = [
 
 [[package]]
 name = "prost-build"
-version = "0.12.2"
+version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1fa3d084c8704911bfefb2771be2f9b6c5c0da7343a71e0021ee3c665cada738"
+checksum = "c55e02e35260070b6f716a2423c2ff1c3bb1642ddca6f99e1f26d06268a0e2d2"
 dependencies = [
  "bytes",
  "heck",
- "itertools 0.11.0",
+ "itertools 0.10.5",
  "log",
  "multimap",
  "once_cell",
@@ -1979,12 +1989,12 @@ dependencies = [
 
 [[package]]
 name = "prost-derive"
-version = "0.12.2"
+version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "065717a5dfaca4a83d2fe57db3487b311365200000551d7a364e715dbf4346bc"
+checksum = "efb6c9a1dd1def8e2124d17e83a20af56f1570d6c2d2bd9e266ccb768df3840e"
 dependencies = [
  "anyhow",
- "itertools 0.11.0",
+ "itertools 0.10.5",
  "proc-macro2",
  "quote",
  "syn 2.0.32",
@@ -1992,9 +2002,9 @@ dependencies = [
 
 [[package]]
 name = "prost-types"
-version = "0.12.2"
+version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8339f32236f590281e2f6368276441394fcd1b2133b549cc895d0ae80f2f9a52"
+checksum = "193898f59edcf43c26227dcd4c8427f00d99d61e95dcde58dabd49fa291d470e"
 dependencies = [
  "prost",
 ]
@@ -2156,6 +2166,7 @@ dependencies = [
 [[package]]
 name = "risc0-binfmt"
 version = "0.19.0"
+source = "git+https://github.com/aoraki-labs/risc0?branch=zkml-demo#5980491d021bf707daa5e095b37037fa74744287"
 dependencies = [
  "anyhow",
  "elf",
@@ -2168,6 +2179,7 @@ dependencies = [
 [[package]]
 name = "risc0-build"
 version = "0.19.0"
+source = "git+https://github.com/aoraki-labs/risc0?branch=zkml-demo#5980491d021bf707daa5e095b37037fa74744287"
 dependencies = [
  "anyhow",
  "cargo_metadata",
@@ -2183,6 +2195,7 @@ dependencies = [
 [[package]]
 name = "risc0-circuit-recursion"
 version = "0.19.0"
+source = "git+https://github.com/aoraki-labs/risc0?branch=zkml-demo#5980491d021bf707daa5e095b37037fa74744287"
 dependencies = [
  "anyhow",
  "bytemuck",
@@ -2195,6 +2208,7 @@ dependencies = [
 [[package]]
 name = "risc0-circuit-rv32im"
 version = "0.19.0"
+source = "git+https://github.com/aoraki-labs/risc0?branch=zkml-demo#5980491d021bf707daa5e095b37037fa74744287"
 dependencies = [
  "anyhow",
  "log",
@@ -2207,6 +2221,7 @@ dependencies = [
 [[package]]
 name = "risc0-core"
 version = "0.19.0"
+source = "git+https://github.com/aoraki-labs/risc0?branch=zkml-demo#5980491d021bf707daa5e095b37037fa74744287"
 dependencies = [
  "bytemuck",
  "rand_core",
@@ -2215,6 +2230,7 @@ dependencies = [
 [[package]]
 name = "risc0-zkp"
 version = "0.19.0"
+source = "git+https://github.com/aoraki-labs/risc0?branch=zkml-demo#5980491d021bf707daa5e095b37037fa74744287"
 dependencies = [
  "anyhow",
  "blake2",
@@ -2234,6 +2250,7 @@ dependencies = [
 [[package]]
 name = "risc0-zkvm"
 version = "0.19.0"
+source = "git+https://github.com/aoraki-labs/risc0?branch=zkml-demo#5980491d021bf707daa5e095b37037fa74744287"
 dependencies = [
  "anyhow",
  "bincode",
@@ -2264,6 +2281,7 @@ dependencies = [
 [[package]]
 name = "risc0-zkvm-platform"
 version = "0.19.0"
+source = "git+https://github.com/aoraki-labs/risc0?branch=zkml-demo#5980491d021bf707daa5e095b37037fa74744287"
 dependencies = [
  "bytemuck",
  "getrandom",
@@ -2516,6 +2534,7 @@ dependencies = [
 [[package]]
 name = "smartcore-ml"
 version = "0.1.0"
+source = "git+https://github.com/aoraki-labs/risc0?branch=zkml-demo#5980491d021bf707daa5e095b37037fa74744287"
 dependencies = [
  "hex",
  "itertools 0.12.0",
@@ -2531,6 +2550,7 @@ dependencies = [
 [[package]]
 name = "smartcore-ml-methods"
 version = "0.1.0"
+source = "git+https://github.com/aoraki-labs/risc0?branch=zkml-demo#5980491d021bf707daa5e095b37037fa74744287"
 dependencies = [
  "risc0-build",
 ]
@@ -2702,7 +2722,7 @@ version = "1.0.0"
 dependencies = [
  "bytes",
  "downcast-rs",
- "erased-serde",
+ "erased-serde 0.3.28",
  "json-rpc-types",
  "serde",
  "serde_json",
@@ -2942,11 +2962,11 @@ checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
 
 [[package]]
 name = "typetag"
-version = "0.2.13"
+version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "80960fd143d4c96275c0e60b08f14b81fbb468e79bc0ef8fbda69fb0afafae43"
+checksum = "196976efd4a62737b3a2b662cda76efb448d099b1049613d7a5d72743c611ce0"
 dependencies = [
- "erased-serde",
+ "erased-serde 0.4.0",
  "inventory",
  "once_cell",
  "serde",
@@ -2955,9 +2975,9 @@ dependencies = [
 
 [[package]]
 name = "typetag-impl"
-version = "0.2.13"
+version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bfc13d450dc4a695200da3074dacf43d449b968baee95e341920e47f61a3b40f"
+checksum = "2eea6765137e2414c44c7b1e07c73965a118a72c46148e1e168b3fc9d3ccf3aa"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -168,7 +168,7 @@ pub async fn start(prover_sender: Arc<Sender<ProverEvent>>, client: Arc<Client>)
                                 _ = heartbeat_interval.tick() => {
                                     let task = LATEST_TASK_CONTENT.lock().await;
                                     let task_current = (*task).clone();
-                                    let heart_msg: Vec<&str> =task_current.split("#").collect();
+                                    let heart_msg: Vec<&str> =task_current.split("@").collect();
                                     if heart_msg.len()==2 {
                                         let heartbeat = StratumMessage::Heartbeat(Id::Num(id),heart_msg[0].to_string(),heart_msg[1].to_string());  
                                         if let Err(e) = framed.send(heartbeat).await {

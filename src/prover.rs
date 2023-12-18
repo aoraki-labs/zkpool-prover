@@ -3,7 +3,7 @@ use std::sync::{
     Arc,
 };
 
-use log::{debug, info};
+use tracing::{error, info, warn, debug};
 use taiko_stratum::message::StratumMessage;
 use json_rpc_types::Id;
 
@@ -14,7 +14,7 @@ use tokio::{
 sync::mpsc,
 task::{self, JoinHandle},
 };
-use tracing::error;
+// use tracing::error;
 
 use crate::Client;
 
@@ -100,7 +100,7 @@ pub async fn init(
                         }
 
                         //Cache the newest block number
-                        let cached_task=format!("{}#{}",project,task_id);
+                        let cached_task=format!("{}@{}",project,task_id);
                         let current_task = LATEST_TASK_CONTENT.clone();
                         let mut current_task_content = current_task.lock().await;
                         *current_task_content = cached_task;
@@ -171,10 +171,10 @@ async fn new_work(&self,project_name:String, block: String, task_content: String
 
                     //parse the task_id content
                     let task_id_split_vec: Vec<&str>=task_id_split.split("#").collect();
-                    info!("task id content is:{:?}",task_id_split);
                     if task_id_split.len()==1{
                         res = generate_proof(demo_task_inputs).await;
                     }else {
+                        info!("invoke generate_segment_proof para is:{}-{}",demo_task_inputs,task_id_split_vec[1].to_string());
                         res = generate_segment_proof(demo_task_inputs,task_id_split_vec[1].to_string()).await;
                     }
 
@@ -205,6 +205,7 @@ async fn new_work(&self,project_name:String, block: String, task_content: String
 
                 // let time_gap =(Instant::now().duration_since(time_started).as_millis() as u32)/1000;
 
+                info!("start to send heartbeat msg when receive task");
                 let message = StratumMessage::Heartbeat(
                     Id::Num(0),
                     project_name.clone(),
@@ -271,7 +272,7 @@ pub async fn need_send_proof(_project:String,block:String) -> bool {
     if *current_task_content==String::from(""){ //initial
         return true
     }else {
-        let task_vec: Vec<&str> = (*current_task_content).split("#").collect();
+        let task_vec: Vec<&str> = (*current_task_content).split("@").collect();
         if task_vec.len() != 2{
             return true
         }else {

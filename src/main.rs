@@ -8,7 +8,6 @@ use std::{net::ToSocketAddrs, sync::Arc};
 
 use clap::Parser;
 
-use smartcore_ml::{generate_proof, generate_proof_test};
 use tracing::{error, info};
 use tracing_subscriber::layer::SubscriberExt;
 

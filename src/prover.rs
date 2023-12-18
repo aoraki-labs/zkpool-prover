@@ -3,7 +3,7 @@ use std::sync::{
     Arc,
 };
 
-use log::debug;
+use log::{debug, info};
 use taiko_stratum::message::StratumMessage;
 use json_rpc_types::Id;
 
@@ -14,7 +14,7 @@ use tokio::{
 sync::mpsc,
 task::{self, JoinHandle},
 };
-use tracing::{error, info};
+use tracing::error;
 
 use crate::Client;
 
@@ -24,7 +24,7 @@ use std::collections::HashMap;
 use std::time::Instant;
 
 
-use smartcore_ml::generate_proof;
+use smartcore_ml::{generate_proof,generate_segment_proof};
 
 use serde::{Serialize, Deserialize};
 
@@ -131,11 +131,12 @@ async fn new_work(&self,project_name:String, block: String, task_content: String
     let project_map_info = (*project_map).clone();
     let project_name_bak = project_name.clone();
     let task_id: String = block.clone();
+    let task_id_split: String = block.clone();
 
     let project_info = match project_map_info.get(&project_name.clone()){
         Some(r) => r.clone(),
         None => {
-            error!("can find this project {} info,ignore it",project_name.clone());
+            error!("can not find this project {} info,ignore it",project_name.clone());
             return
         },
     };
@@ -144,9 +145,11 @@ async fn new_work(&self,project_name:String, block: String, task_content: String
 
     if project_name.clone()=="demo".to_string(){
         let _l2_rpc = project_info.rpc_url;
+
+        //Parse the task content
         let input = String::from_utf8(hex::decode(task_content).unwrap()).unwrap();
-        let task_vec: Vec<&str> = input.split("\"").collect(); //Parse the task content
-        if task_vec.len() <= 2{
+        let task_vec: Vec<&str> = input.split("\"").collect(); 
+        if task_vec.len() <= 2{  //invalid proof request paramter
             error!("{} task parameter error or requestor dummy task,ignore it",project_name.clone());
             return
         } 
@@ -160,11 +163,21 @@ async fn new_work(&self,project_name:String, block: String, task_content: String
                 let _time_started = Instant::now();
                 tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
                 let status:u8=1;
+                let mut res = "".to_string();
                 let _proof_result = "dummy_data".to_string();
 
                 let _ = tokio::task::spawn(async move{ //main process
                     let time_started = Instant::now();
-                    let res = generate_proof(demo_task_inputs).await;
+
+                    //parse the task_id content
+                    let task_id_split_vec: Vec<&str>=task_id_split.split("#").collect();
+                    info!("task id content is:{:?}",task_id_split);
+                    if task_id_split.len()==1{
+                        res = generate_proof(demo_task_inputs).await;
+                    }else {
+                        res = generate_segment_proof(demo_task_inputs,task_id_split_vec[1].to_string()).await;
+                    }
+
                     let time_gap =(Instant::now().duration_since(time_started).as_millis() as u32)/1000;
                     if need_send_proof(project_name_bak.clone(), block.clone()).await {
                         let message = StratumMessage::Submit(
@@ -202,7 +215,6 @@ async fn new_work(&self,project_name:String, block: String, task_content: String
                 }else{
                     info!("zkpool:send the Heartbeat success,task id:{},project id:{}",project_name.clone(),task_id.clone());
                 }
-
 
                 // if need_send_proof(project_name.clone(), task_id.clone()).await {
                 //     let task = LATEST_TASK_CONTENT.lock().await;

@@ -100,7 +100,7 @@ pub async fn init(
                         }
 
                         //Cache the newest block number
-                        let cached_task=format!("{}@{}",project,task_id);
+                        let cached_task=format!("{}*{}",project,task_id);
                         let current_task = LATEST_TASK_CONTENT.clone();
                         let mut current_task_content = current_task.lock().await;
                         *current_task_content = cached_task;
@@ -170,7 +170,7 @@ async fn new_work(&self,project_name:String, block: String, task_content: String
                     let time_started = Instant::now();
 
                     //parse the task_id content
-                    let task_id_split_vec: Vec<&str>=task_id_split.split("#").collect();
+                    let task_id_split_vec: Vec<&str>=task_id_split.split("@").collect();
                     if task_id_split.len()==1{
                         res = generate_proof(demo_task_inputs).await;
                     }else {
@@ -272,7 +272,7 @@ pub async fn need_send_proof(_project:String,block:String) -> bool {
     if *current_task_content==String::from(""){ //initial
         return true
     }else {
-        let task_vec: Vec<&str> = (*current_task_content).split("@").collect();
+        let task_vec: Vec<&str> = (*current_task_content).split("*").collect();
         if task_vec.len() != 2{
             return true
         }else {

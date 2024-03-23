@@ -5,7 +5,7 @@ It is used to connect with ZKPool in order to obtain proving tasks and generate 
 
 ### Supported ZKP projects
 
-1. Taiko A5
+1. Taiko A6
 2. More is coming
 
 ### Hardware Requirements
@@ -28,13 +28,13 @@ Coming soon.
 Visit https://github.com/aoraki-labs/zkpool-prover/releases and download the latest release or use wget command like below. 
 Please ensure that you select the appropriate tar file for your hardware and the correct release version.
 ```
-   wget https://github.com/aoraki-labs/zkpool-prover/releases/download/v1.0-taiko-a5/x86_64-unknown-linux-musl.tar.gz
+   wget https://github.com/aoraki-labs/zkpool-prover/releases/download/v1.0-taiko-a6/x86_64-unknown-linux-musl.tar.gz
    tar -zxvf x86_64-unknown-linux-musl.tar.gz
 ```
 
 ### Download the running script
 
-Download the script run_prover.sh from https://github.com/aoraki-labs/zkpool-prover/tree/taiko-a5-testnet
+Download the script run_prover.sh from https://github.com/aoraki-labs/zkpool-prover/tree/a6-r0
 
 ### Run
 
@@ -84,7 +84,7 @@ You can also see more detail in run-prover.sh and refer to the usage help (`./zk
 
 ## Test
 
-### Run TestCase (one a5 proof task in actuality)
+### Run TestCase (one a6 proof task in actuality)
 
 ```
 wget https://storage.googleapis.com/zkevm-circuits-keys/kzg_bn254_22.srs -P ./

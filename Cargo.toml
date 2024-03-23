@@ -28,15 +28,22 @@ bincode = "1.3.3"
 byteorder = "1.4.3"
 ansi_term = "0.12.1"
 json-rpc-types = "1.0.3"
-machine-uid = "0.4.0"
+machine-uid = "0.5.1"
 hex = "0.4.3"
 lazy_static = "1.4.0"
+clap = { version = "4.0.14", features = ["derive", "env"] }
 serde_yaml = "0.9.23"
 serde = { version = "1.0.136", features = ["derive"] }
 
+[dependencies.zkevm-circuits]
+git = "https://github.com/taikoxyz/zkevm-circuits.git"
+rev = "4314b27fdddd3770f1c9e6bcd28ad83bcc6571c7"
+
+[patch."https://github.com/taikoxyz/zkevm-circuits.git"]
+zkevm-circuits = { git = "https://github.com/aoraki-labs/zkevm-circuits", rev = "b0f50e7839857d9a0fceaaab220655e6aff5b2bc" }
+
 [dependencies.taiko-stratum]
 path = "./stratum"
-
 
 [dependencies.smartcore-ml]
 git = "https://github.com/aoraki-labs/risc0"
@@ -44,10 +51,21 @@ branch = "zkml-demo"
 package = "smartcore-ml"
 
 
-[dependencies.clap]
-version = "4.0.10"
-features = ["derive"]
+[patch."https://github.com/privacy-scaling-explorations/halo2.git"]
+halo2_proofs = { git = "https://github.com/taikoxyz/halo2.git", branch = "taiko/unstable" }
 
+[patch."https://github.com/taikoxyz/halo2wrong.git"]
+halo2wrong = { git = "https://github.com/aoraki-labs/halo2wrong",rev = "07afd1119dd34693a0ad7af0e74b5b2b66d3196f"}
+
+#taiko A6 testnet core lib
+[dependencies.prover]
+git = "https://github.com/aoraki-labs/taiko-prover-core"
+branch = "taiko-a6-final"
+package = "prover"
+[dependencies.zkevm_common]
+git = "https://github.com/aoraki-labs/taiko-prover-core"
+branch = "taiko-a6-final"
+package = "zkevm_common"
 
 [dependencies.tokio]
 version = "1.34.0"

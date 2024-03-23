@@ -1,9 +1,8 @@
 name_list:
   - demo
-  - taikoA5
+  - taikoA6_zkevm
 
 rpc_url_list:
-  - https://rpc.l3test.taiko.xyz
-  - https://rpc.jolnir.taiko.xyz/
-
-
+  # TODO: update for demo
+  - https://l1rpc.katla.taiko.xyz/
+  - https://rpc.katla.taiko.xyz/

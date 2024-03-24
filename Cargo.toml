@@ -60,11 +60,13 @@ halo2wrong = { git = "https://github.com/aoraki-labs/halo2wrong",rev = "07afd111
 #taiko A6 testnet core lib
 [dependencies.prover]
 git = "https://github.com/aoraki-labs/taiko-prover-core"
-branch = "taiko-a6-final"
+rev = "382accd01eea87106b2895a20356547a90f061df"
+#branch = "taiko-a6-final"
 package = "prover"
 [dependencies.zkevm_common]
 git = "https://github.com/aoraki-labs/taiko-prover-core"
-branch = "taiko-a6-final"
+rev = "382accd01eea87106b2895a20356547a90f061df"
+#branch = "taiko-a6-final"
 package = "zkevm_common"
 
 [dependencies.tokio]

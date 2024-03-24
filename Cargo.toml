@@ -45,10 +45,10 @@ zkevm-circuits = { git = "https://github.com/aoraki-labs/zkevm-circuits", rev = 
 [dependencies.taiko-stratum]
 path = "./stratum"
 
-[dependencies.smartcore-ml]
-git = "https://github.com/aoraki-labs/risc0"
-branch = "zkml-demo"
-package = "smartcore-ml"
+#[dependencies.smartcore-ml]
+#git = "https://github.com/aoraki-labs/risc0"
+#branch = "zkml-demo"
+#package = "smartcore-ml"
 
 
 [patch."https://github.com/privacy-scaling-explorations/halo2.git"]

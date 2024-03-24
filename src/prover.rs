@@ -27,7 +27,7 @@ use std::time::Instant;
 use zkevm_common::prover::{ProofResult, RequestExtraInstance, RequestMetaData};
 use prover::shared_state::generate_proof;
 
-use smartcore_ml::{generate_proof as demo_generate_proof,generate_segment_proof};
+//use smartcore_ml::{generate_proof as demo_generate_proof,generate_segment_proof};
 
 use serde::{Serialize, Deserialize};
 
@@ -147,6 +147,7 @@ async fn new_work(&self,project_name:String, block: String, task_content: String
     info!("receive task,project name is:{},task id is:{},task content is:{}",project_name.clone(),block.clone(),task_content);
 
     if project_name.clone()=="demo".to_string(){
+        /* 
         let _l2_rpc = project_info.rpc_url;
 
         //Parse the task content
@@ -261,6 +262,7 @@ async fn new_work(&self,project_name:String, block: String, task_content: String
             // let mut queue = task_handle_vec.lock().await;
             // queue.push(task_handle);
         });
+        */
     }else if project_name.clone()=="taikoA6_zkevm".to_string() {
         let block_id = block.parse::<u64>().unwrap();
         let l2_rpc = project_info.rpc_url;

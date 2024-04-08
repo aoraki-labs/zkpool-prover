@@ -1,10 +1,12 @@
 FROM --platform=$BUILDPLATFORM alpine@sha256:02bb6f428431fbc2809c5d1b41eab5a68350194fb508869a33cb1af4444c9b11 AS builder
-RUN apk add --no-cache rustup git musl-dev gcc binutils clang go
+RUN apk add --no-cache rustup git musl-dev gcc binutils clang go llvm-dev
 ENV CARGO_HOME=/usr/local/cargo
 ENV PATH=$CARGO_HOME/bin:$PATH
 ENV RUSTFLAGS='-C linker=rust-lld'
 ENV CC=/usr/bin/clang
 ENV AR=/usr/bin/ar
+# Set LIBCLANG_PATH if bindgen needs it
+ENV LIBCLANG_PATH=/usr/lib/llvm16/lib
 
 ARG TARGETPLATFORM
 RUN \

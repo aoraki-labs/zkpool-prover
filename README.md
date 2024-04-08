@@ -91,16 +91,6 @@ wget https://storage.googleapis.com/zkevm-circuits-keys/kzg_bn254_22.srs -P ./
 cargo test --release -- --nocapture
 ```
 
-
-
 ## License
 
 AGPL-3.0-or-later
-
-
-
-
-
-
-
-

@@ -18,7 +18,7 @@ WORKDIR /target/src
 COPY rust-toolchain .
 RUN rustup-init -y --no-modify-path --profile minimal --default-toolchain $(cat rust-toolchain) --target $(cat /tmp/target)
 # trigger fetch of crates index
-RUN cargo search --limit 0
+RUN cargo search --limit 1
 
 COPY . .
 RUN cargo build --release --target-dir /target --target $(cat /tmp/target) && \
